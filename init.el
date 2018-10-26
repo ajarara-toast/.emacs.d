@@ -23,6 +23,9 @@
 (require 'diminish)
 (require 'bind-key)
 
+;; Why is this now necessary?
+(package-initialize)
+
 ;; this didn't seem to work, would not have the first frame be terminus'd
 ;; (set-face-attribute 'default nil :font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
 ;; this worked!
@@ -49,8 +52,9 @@
 (toggle-word-wrap)
 
 (defvar my-hl-line-mode-hook-list
-  `(prog-mode-hook
-    circe-mode-hook))
+  `(prog-mode-hook)
+    ;;circe-mode-hook)
+)
 
 (dolist (this-mode-hook my-hl-line-mode-hook-list)
   (add-hook this-mode-hook `hl-line-mode))
@@ -66,11 +70,6 @@
 (setq vc-follow-symlinks nil)
 
 (setq disabled-command-function nil)
-
-(use-package lsp-mode
-  :ensure t
-    :recipe (lsp-mode :type git :host github :repo "alphor/lsp-mode"
-                      :upstream (:host github :repo "emacs-lsp/lsp-mode")))
 
 (straight-use-package 'buttercup)
 
@@ -357,22 +356,6 @@
   ;; start
   (elpy-enable))
 
-(use-package kotlin-mode
-  :ensure t
-  :recipe (:type git :host github :repo "alphor/kotlin-mode"
-           :upstream (:host github :repo "Emacs-Kotlin-Mode-Maintainers/kotlin-mode")))
-
-(use-package markdown-mode 
-    :ensure t
-    :recipe (markdown-mode :type git :host github :repo "alphor/markdown-mode"
-                   :upstream (:host github :repo "jrblevin/markdown-mode")))
-
-(use-package pelican-mode
-  :ensure t
-
-  :recipe (pelican-mode :type git :host github :repo "alphor/pelican-mode"
-                 :upstream (:host github :repo "qdot/pelican-mode")))
-
 (use-package indium
   :disabled t
   :config
@@ -385,9 +368,10 @@
 (setq indium-chrome-executable "chromium-browser")
 
 (use-package circe
+  :disabled t
   :ensure t
-  :recipe (circe :type git :host github :repo "alphor/circe"
-                 :upstream (:host github :repo "jorgenschaefer/circe"))
+  ;; :recipe (circe :type git :host github :repo "alphor/circe"
+  ;;               :upstream (:host github :repo "jorgenschaefer/circe"))
 
 :config
 (setq circe-network-defaults nil)
@@ -464,27 +448,6 @@
 )
 
 (straight-use-package
- '(circe-actions :type git :host github :repo "alphor/circe-actions"))
-
-(use-package circe-actions)
-(use-package circe-znc)
-
-(defvar circe-actions-inspect-arg-list '()
-  "A list of variables that were passed to circe-actions-inspect-args.")
-(defun circe-actions-inspect-args (&rest args)
-  "A utility function designed to show you what is passed to an
-  arbitrary handler. Was very useful when inspecting, so I thought
-  I'd leave it in here. Be warned with 30+ channels
-  circe-actions-inspect-arg-list grows mighty fast, if you're adventerous
-  and use circe-actions-t as a condition-function-p"
-  (setq circe-actions-inspect-arg-list (cons args circe-actions-inspect-arg-list))
-  (message
-   (with-temp-buffer
-     (cl-prettyprint args)
-     (buffer-string)
-     )))
-
-(straight-use-package
   '(nix-mode :type git :host github :repo "alphor/nix-mode"
              :upstream (:host github :repo "NixOS/nix-mode")))
 (use-package nix-mode)
@@ -519,22 +482,13 @@
       '((python-shell-interpreter .  "/home/ajarara/proj/viz/repl.nix")
         (python-shell-interpreter .  "/home/ajarara/proj/webkov/shell.nix")))
 
-(use-package sx :ensure t)
-
 (setq x-select-enable-clipboard-manager nil)
 
 ;; (setq custom-file "/dev/null")
 
 (setq-default indent-tabs-mode nil)
 
-;; (load-theme 'misterioso t)
-(use-package monokai-theme
-  :ensure t
-  :recipe (monokai-theme :type git :host github :repo "alphor/monokai-emacs"
-                 :upstream (:host github :repo "oneKelvinSmith/monokai-emacs"))
-  :config
-  (setq monokai-comments "chocolate")
-  (load-theme `monokai t))
+(load-theme 'misterioso t)
 
 (straight-use-package 'projectile)
 (use-package projectile

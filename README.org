@@ -45,6 +45,11 @@ Use package is a way to tidy up config and a convenient way to lazy load package
   (require 'bind-key)
 #+END_SRC
 
+** Package init
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; Why is this now necessary?
+(package-initialize)
+#+END_SRC
 ** Font
 I tried the default font (DejaVu Sans Mono, use M-x describe-font to find out what yours is), source code pro, and a couple others the emacs subreddit recommended, but all I need is a monospace font that looks nice and doesn't crap out on <= 80 characters. Terminus is that font.
 
@@ -87,8 +92,9 @@ Might be considered a hindrance, but I rarely need more than 80 columns while pr
 I don't know how I feel using hl-line-mode on EVERY buffer. Instead, let's just add the ones that make sense.
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (defvar my-hl-line-mode-hook-list
-  `(prog-mode-hook
-    circe-mode-hook))
+  `(prog-mode-hook)
+    ;;circe-mode-hook)
+)
 
 (dolist (this-mode-hook my-hl-line-mode-hook-list)
   (add-hook this-mode-hook `hl-line-mode))
@@ -132,11 +138,12 @@ Emacs should let me be as stupid as I want.
 ** lsp-mode
 The language server protocol is neat! I'd like to be able to use emacs to edit java, kotlin code with little fuss. This requires jump to definition, find usages, _maybe_ incremental compilation. 
 
-#+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package lsp-mode
-    :ensure t
-      :recipe (lsp-mode :type git :host github :repo "alphor/lsp-mode"
-                        :upstream (:host github :repo "emacs-lsp/lsp-mode")))
+This is disabled!
+#+BEGIN_SRC emacs-lisp 
+  (straight-use-package lsp-mode
+      ;; :recipe(lsp-mode :type git :host github :repo "alphor/lsp-mode"
+      ;;                  :upstream (:host github :repo "emacs-lsp/lsp-mode"))
+)
 #+END_SRC
 
 ** Buttercup
@@ -566,11 +573,13 @@ It was a little difficult figuring out how to change tests programmatically, so 
 #+END_SRC
 
 ** kotlin
-#+BEGIN_SRC emacs-lisp :tangle init.el
+   temporarily disabled...
+#+BEGIN_SRC emacs-lisp 
   (use-package kotlin-mode
     :ensure t
-    :recipe (:type git :host github :repo "alphor/kotlin-mode"
-             :upstream (:host github :repo "Emacs-Kotlin-Mode-Maintainers/kotlin-mode")))
+    ;; :recipe (:type git :host github :repo "alphor/kotlin-mode"
+    ;;         :upstream (:host github :repo "Emacs-Kotlin-Mode-Maintainers/kotlin-mode"))
+)
 #+END_SRC
 
 Previously I had an LSP block here, but it just wasn't good enough, for two reasons:
@@ -584,11 +593,13 @@ Oh, you knew it was coming.
 For authoring pelican posts, and for README's that aren't in org.
 
 It just recently had its 10th birthday!
-#+BEGIN_SRC emacs-lisp :tangle init.el
+DISABLED
+#+BEGIN_SRC emacs-lisp 
 (use-package markdown-mode 
     :ensure t
-    :recipe (markdown-mode :type git :host github :repo "alphor/markdown-mode"
-                   :upstream (:host github :repo "jrblevin/markdown-mode")))
+    ;; :recipe (markdown-mode :type git :host github :repo "alphor/markdown-mode"
+    ;;               :upstream (:host github :repo "jrblevin/markdown-mode"))
+)
 #+END_SRC
 
 ** pelican mode
@@ -596,13 +607,14 @@ Can't be found on melpa, but is on github:
 
 Pelican-mode automatically adds an enabler to markdown-mode-hook, which enables itself if it determines that it is indeed a site. Alternatively, this can be done with a dir-local, so as to strip out the magic of how pelican determines something is a pelican site.
 
-
-#+BEGIN_SRC emacs-lisp :tangle init.el
+Disabled
+#+BEGIN_SRC emacs-lisp
   (use-package pelican-mode
     :ensure t
 
-    :recipe (pelican-mode :type git :host github :repo "alphor/pelican-mode"
-                   :upstream (:host github :repo "qdot/pelican-mode")))
+    ;; :recipe (pelican-mode :type git :host github :repo "alphor/pelican-mode"
+    ;;               :upstream (:host github :repo "qdot/pelican-mode"))
+)
 #+END_SRC
 
 ** indium
@@ -628,9 +640,10 @@ probably going to hit this next at RC.
 [[https://github.com/jorgenschaefer/circe][Circe]] is described as an IRC client that is an intermediary between erc and rcirc. It features pretty good default options (with one exception that's really not all that important), and default network configuration out of the box. It's written by jorgenschaefer, who also is the lead on elpy!
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (use-package circe
+  :disabled t
   :ensure t
-  :recipe (circe :type git :host github :repo "alphor/circe"
-                 :upstream (:host github :repo "jorgenschaefer/circe"))
+  ;; :recipe (circe :type git :host github :repo "alphor/circe"
+  ;;               :upstream (:host github :repo "jorgenschaefer/circe"))
 #+END_SRC
 
 I use ZNC to connect to my networks. So far, I only really fool around in #emacs, and some other dev-related channels. But this means I don't really care about circe's default channels, so I clear it here.
@@ -734,7 +747,8 @@ fun fact: the only other person that is also on both #freenode and ##wikimedia-k
 #+END_SRC
 
 [[https://github.com/alphor/circe-actions][Circe-actions]] is a package that handles events coming in from IRC. 
-#+BEGIN_SRC emacs-lisp :tangle init.el
+DISABLED while I figure out what's going on
+#+BEGIN_SRC emacs-lisp
   (straight-use-package
    '(circe-actions :type git :host github :repo "alphor/circe-actions"))
 
@@ -743,7 +757,8 @@ fun fact: the only other person that is also on both #freenode and ##wikimedia-k
 #+END_SRC
 
 Useful for debugging interactively.
-#+BEGIN_SRC emacs-lisp :tangle init.el
+disabled
+#+BEGIN_SRC emacs-lisp
   (defvar circe-actions-inspect-arg-list '()
     "A list of variables that were passed to circe-actions-inspect-args.")
   (defun circe-actions-inspect-args (&rest args)
@@ -841,8 +856,9 @@ Not really in use anymore.
 One reason I love using terminals in emacs is because of text manipulation. It's so flipping good at it! But I spend a lot of time editing email, or using stackoverflow. Bringing it into emacs would be great.
 
 This makes me so happy. Ootb it works, then it asks you for authentication and handles all the secrets itself. I've symlinked .sx (stored in .emacs.d) into docs so that I can nuke .emacs.d, which I do every so often.
-#+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package sx :ensure t)
+Disabled.
+#+BEGIN_SRC
+;; (use-package sx :ensure t)
 #+END_SRC
 ** QOL fixes
 To be honest I have no idea what this does, but I know that it causes emacs to hang on exit. Setting it to nil disables it, and there's no apparent loss of functionality of my clipboard interaction with emacs.. so... :|
@@ -860,17 +876,19 @@ I reject your reality and substitute my own.
 ** Theme
 I like Monokai. In case I ever need to use a default theme, I'd use misterioso.
 #+BEGIN_SRC emacs-lisp :tangle init.el
-
-;; (load-theme 'misterioso t)
+(load-theme 'misterioso t)
+#+END_SRC
+Disabled below.. something odd going on and don't have time to fix it.
+#+BEGIN_SRC emacs-lisp 
 (use-package monokai-theme
   :ensure t
-  :recipe (monokai-theme :type git :host github :repo "alphor/monokai-emacs"
-                 :upstream (:host github :repo "oneKelvinSmith/monokai-emacs"))
+  ;; :recipe (monokai-theme :type git :host github :repo "alphor/monokai-emacs"
+  ;;               :upstream (:host github :repo "oneKelvinSmith/monokai-emacs"))
   :config
   (setq monokai-comments "chocolate")
   (load-theme `monokai t))
 
-#+END_SRC
+#+End_SRC
 
 ** projectile
 projectile-compile-project shaves seconds off my builds. SECONDS!
