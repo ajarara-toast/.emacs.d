@@ -416,8 +416,8 @@ and that's it! for more info, check out [[http://orgmode.org/manual/Template-ele
          '(("t" "Todo" entry (file+headline "~/Documents/org/gtd-capture.org" "Tasks")
             "* TODO %?\n  %i\n  %a")
            ("l" "log" entry (file+datetree "~/Documents/org/laptop.org")
-            "* %?\nEntered on %U\n %i")
-         )
+            "* %?\nEntered on %U\n %i"))
+   )
 #+END_SRC
 
 Here we hold most of our gtd configuration, following [[http://orgmode.org/worg/org-tutorials/orgtutorial_dto.html][this post]]. This means org-agenda... other stuff.
