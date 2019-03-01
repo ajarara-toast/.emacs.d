@@ -22,7 +22,7 @@
  ("general.el" . "00efad765a3ace42a2833c65a169d96c7925623b")
  ("goto-chg" . "79fdd52dff5422d8191e34bf4c9cb86213d07211")
  ("js2-mode" . "df51992a648c7fb3e441106defdbffa2ef2f020d")
- ("magit" . "cb1741e693f2e22f89a367fc518b53cf28c6c9d5")
+ ("magit" . "791901b2f1d26fa0a383147fe77948a9abc753da")
  ("markdown-mode" . "735fe6d1f79f5ff441f9559dc57831a566d21f60")
  ("melpa" . "eb13cb0dba1696cc51132cd1ff723fa17f892a7c")
  ("monokai-emacs" . "623083f05c381761a8cf2fd923e493bfa8762c28")

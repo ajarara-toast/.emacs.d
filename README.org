@@ -10,6 +10,11 @@ I won't be going over what each package does, (the README files do a better job 
 
 Initially I used [[https://github.com/quelpa/quelpa][quelpa]] to manage my configuration, in an attempt to have completely reproducible config. I'm using [[https://github.com/raxod502/straight.el][straight.el]] here to make it easier to contribute upstream and to make sure I don't get bit by some bad code.
 * Config
+  ** package-initialize
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;; not sure why this is needed... didn't we have a debacle on emacs-devel over this thing last year?
+(package-initialize)
+#+END_SRC
 ** Straight bootstrap
 Straight downloads a file. Wondering why bootstrap-version is defined in this block but never used. Even though emacs has dynamic binding, I'm not setting the version globally...
 #+BEGIN_SRC emacs-lisp :tangle init.el
@@ -38,6 +43,7 @@ Use package is a way to tidy up config and a convenient way to lazy load package
       :type git :host github :repo "alphor/use-package"
       :upstream (:host github :repo "jwiegley/use-package")))
 
+  (straight-use-package 'diminish)
   ;; bind-key is provided with use-package, diminish I only use once or twice
   (eval-when-compile
     (require 'use-package))
@@ -133,12 +139,24 @@ Emacs should let me be as stupid as I want.
 The language server protocol is neat! I'd like to be able to use emacs to edit java, kotlin code with little fuss. This requires jump to definition, find usages, _maybe_ incremental compilation. 
 
 #+BEGIN_SRC emacs-lisp :tangle init.el
-  (use-package lsp-mode
-    :ensure t
-      :recipe (lsp-mode :type git :host github :repo "alphor/lsp-mode"
-                        :upstream (:host github :repo "emacs-lsp/lsp-mode")))
+  (straight-use-package 'lsp-mode)
+  (use-package lsp-mode)
 #+END_SRC
 
+** jsx-mode
+install rjsx, configure it to spawn an lsp server (jsx support is built in to lsp-mode), and make some minor fixes 
+#+BEGIN_SRC emacs-lisp :tangle init.el
+  (straight-use-package 'rjsx-mode)
+  (add-hook 'rjsx-mode-hook
+            (lambda ()
+              (setq js2-strict-missing-semi-warning nil)
+              (setq js2-basic-offset 2)
+              (lsp-mode)
+              (lsp)))
+  (let ((js-file-names '(".jsx" ".tsx'" ".js" ".ts"))
+        (register-rjsx (lambda (extension) (add-to-list 'auto-mode-alist `(,(concat "\\" extension "\\'") . rjsx-mode)))))
+    (mapc register-rjsx js-file-names))
+#+END_SRC
 ** Buttercup
 A BDD testing framework for emacs lisp. Other powerpuff girls not included.
 
@@ -372,8 +390,8 @@ C-x o is way too much to switch between windows (which is an operation I find my
 
 Magit spoils me.
 #+BEGIN_SRC emacs-lisp :tangle init.el
+(straight-use-package 'magit-popup)
 (straight-use-package 'magit)
-(use-package magit)
 #+END_SRC
 
 ** org mode
@@ -415,7 +433,7 @@ and that's it! for more info, check out [[http://orgmode.org/manual/Template-ele
    (setq org-capture-templates
          '(("t" "Todo" entry (file+headline "~/Documents/org/gtd-capture.org" "Tasks")
             "* TODO %?\n  %i\n  %a")
-           ("l" "log" entry (file+datetree "~/Documents/org/laptop.org")
+           ("l" "log" entry (file+datetree "~/Documents/org/log.org")
             "* %?\nEntered on %U\n %i"))
    )
 #+END_SRC
@@ -460,15 +478,15 @@ I use term instead of ansi-term (tried it in a previous iteration) because it's 
     ;; in NixOS the shell is in /run/current-system
     ;; rather than dispatch on what OS I'm running, just let
     ;; which handle it:
-    (defvar my-term-shell (s-trim (shell-command-to-string "which bash")))
-    (defadvice term (before force-bash)
-      (interactive (list my-term-shell)))
-    (ad-activate 'term)
+    ;; (defvar my-term-shell "/usr/bin/env bash")
+    ;; (defadvice term (before force-bash)
+    ;;   (interactive (list my-term-shell)))
+    ;; (ad-activate 'term)
 
     ;; why is this not the default? 
-    (defun my-term-use-utf8 ()
-      (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-    (add-hook 'term-exec-hook 'my-term-use-utf8)
+    ;; (defun my-term-use-utf8 ()
+    ;;   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+    ;; (add-hook 'term-exec-hook 'my-term-use-utf8)
 
 
     ;; eh.. this makes me sad. All I wanted was C-x.
@@ -482,10 +500,6 @@ I use term instead of ansi-term (tried it in a previous iteration) because it's 
 
     ;; 2048 lines of output is way too restrictive.
     (setq term-buffer-maximum-size 8192)
-    :bind*
-    (("C-z" . term)
-     :map term-raw-map
-     ("C-y" . term-paste))
   )
 #+END_SRC
 
@@ -602,10 +616,8 @@ probably going to hit this next at RC.
 
 [[https://github.com/jorgenschaefer/circe][Circe]] is described as an IRC client that is an intermediary between erc and rcirc. It features pretty good default options (with one exception that's really not all that important), and default network configuration out of the box. It's written by jorgenschaefer, who also is the lead on elpy!
 #+BEGIN_SRC emacs-lisp :tangle init.el
+(straight-use-package 'circe)
 (use-package circe
-  :ensure t
-  :recipe (circe :type git :host github :repo "alphor/circe"
-                 :upstream (:host github :repo "jorgenschaefer/circe"))
 #+END_SRC
 
 I use ZNC to connect to my networks. So far, I only really fool around in #emacs, and some other dev-related channels. But this means I don't really care about circe's default channels, so I clear it here.
@@ -817,7 +829,8 @@ One reason I love using terminals in emacs is because of text manipulation. It's
 
 This makes me so happy. Ootb it works, then it asks you for authentication and handles all the secrets itself. I've symlinked .sx (stored in .emacs.d) into docs so that I can nuke .emacs.d, which I do every so often.
 #+BEGIN_SRC emacs-lisp :tangle init.el
-(use-package sx :ensure t)
+(straight-use-package 'sx)
+(use-package sx)
 #+END_SRC
 ** QOL fixes
 To be honest I have no idea what this does, but I know that it causes emacs to hang on exit. Setting it to nil disables it, and there's no apparent loss of functionality of my clipboard interaction with emacs.. so... :|
@@ -836,11 +849,9 @@ I reject your reality and substitute my own.
 I like Monokai. In case I ever need to use a default theme, I'd use misterioso.
 #+BEGIN_SRC emacs-lisp :tangle init.el
 
+(straight-use-package 'monokai-theme)
 ;; (load-theme 'misterioso t)
 (use-package monokai-theme
-  :ensure t
-  :recipe (monokai-theme :type git :host github :repo "alphor/monokai-emacs"
-                 :upstream (:host github :repo "oneKelvinSmith/monokai-emacs"))
   :config
   (setq monokai-comments "chocolate")
   (load-theme `monokai t))

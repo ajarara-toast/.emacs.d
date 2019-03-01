@@ -1,4 +1,7 @@
 
+;; not sure why this is needed... didn't we have a debacle on emacs-devel over this thing last year?
+(package-initialize)
+
 (let ((bootstrap-file (concat user-emacs-directory "straight/bootstrap.el"))
       (bootstrap-version 2))
   (unless (file-exists-p bootstrap-file)
@@ -17,6 +20,7 @@
     :type git :host github :repo "alphor/use-package"
     :upstream (:host github :repo "jwiegley/use-package")))
 
+(straight-use-package 'diminish)
 ;; bind-key is provided with use-package, diminish I only use once or twice
 (eval-when-compile
   (require 'use-package))
@@ -67,10 +71,19 @@
 
 (setq disabled-command-function nil)
 
-(use-package lsp-mode
-  :ensure t
-    :recipe (lsp-mode :type git :host github :repo "alphor/lsp-mode"
-                      :upstream (:host github :repo "emacs-lsp/lsp-mode")))
+(straight-use-package 'lsp-mode)
+(use-package lsp-mode)
+
+(straight-use-package 'rjsx-mode)
+(add-hook 'rjsx-mode-hook
+          (lambda ()
+            (setq js2-strict-missing-semi-warning nil)
+            (setq js2-basic-offset 2)
+            (lsp-mode)
+            (lsp)))
+(let ((js-file-names '(".jsx" ".tsx'" ".js" ".ts"))
+      (register-rjsx (lambda (extension) (add-to-list 'auto-mode-alist `(,(concat "\\" extension "\\'") . rjsx-mode)))))
+  (mapc register-rjsx js-file-names))
 
 (straight-use-package 'buttercup)
 
@@ -226,8 +239,8 @@
     (setq aw-scope 'frame)
     )
 
+(straight-use-package 'magit-popup)
 (straight-use-package 'magit)
-(use-package magit)
 
 (use-package org
   :init
@@ -240,10 +253,9 @@
 (setq org-capture-templates
       '(("t" "Todo" entry (file+headline "~/Documents/org/gtd-capture.org" "Tasks")
          "* TODO %?\n  %i\n  %a")
-        ("l" "log" entry (file+datetree "~/Documents/org/laptop.org")
-         "* %?\nEntered on %U\n %i")
-      )
-      
+        ("l" "log" entry (file+datetree "~/Documents/org/log.org")
+         "* %?\nEntered on %U\n %i"))
+)
 
 (setq org-agenda-files (list "~/Documents/org/gtd-capture.org"))
 
@@ -274,15 +286,15 @@
   ;; in NixOS the shell is in /run/current-system
   ;; rather than dispatch on what OS I'm running, just let
   ;; which handle it:
-  (defvar my-term-shell (s-trim (shell-command-to-string "which bash")))
-  (defadvice term (before force-bash)
-    (interactive (list my-term-shell)))
-  (ad-activate 'term)
+  ;; (defvar my-term-shell "/usr/bin/env bash")
+  ;; (defadvice term (before force-bash)
+  ;;   (interactive (list my-term-shell)))
+  ;; (ad-activate 'term)
 
   ;; why is this not the default? 
-  (defun my-term-use-utf8 ()
-    (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-  (add-hook 'term-exec-hook 'my-term-use-utf8)
+  ;; (defun my-term-use-utf8 ()
+  ;;   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+  ;; (add-hook 'term-exec-hook 'my-term-use-utf8)
 
 
   ;; eh.. this makes me sad. All I wanted was C-x.
@@ -296,10 +308,6 @@
 
   ;; 2048 lines of output is way too restrictive.
   (setq term-buffer-maximum-size 8192)
-  :bind*
-  (("C-z" . term)
-   :map term-raw-map
-   ("C-y" . term-paste))
 )
 
 (straight-use-package 'which-key)
@@ -358,10 +366,8 @@
   (add-hook 'js2-mode-hook 'indium-interaction-mode))
 (setq indium-chrome-executable "chromium-browser")
 
+(straight-use-package 'circe)
 (use-package circe
-  :ensure t
-  :recipe (circe :type git :host github :repo "alphor/circe"
-                 :upstream (:host github :repo "jorgenschaefer/circe"))
 
 :config
 (setq circe-network-defaults nil)
@@ -493,7 +499,8 @@
       '((python-shell-interpreter .  "/home/ajarara/proj/viz/repl.nix")
         (python-shell-interpreter .  "/home/ajarara/proj/webkov/shell.nix")))
 
-(use-package sx :ensure t)
+(straight-use-package 'sx)
+(use-package sx)
 
 (setq x-select-enable-clipboard-manager nil)
 
@@ -501,11 +508,9 @@
 
 (setq-default indent-tabs-mode nil)
 
+(straight-use-package 'monokai-theme)
 ;; (load-theme 'misterioso t)
 (use-package monokai-theme
-  :ensure t
-  :recipe (monokai-theme :type git :host github :repo "alphor/monokai-emacs"
-                 :upstream (:host github :repo "oneKelvinSmith/monokai-emacs"))
   :config
   (setq monokai-comments "chocolate")
   (load-theme `monokai t))
