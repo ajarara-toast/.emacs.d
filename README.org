@@ -153,7 +153,7 @@ install rjsx, configure it to spawn an lsp server (jsx support is built in to ls
               (setq js2-basic-offset 2)
               (lsp-mode)
               (lsp)))
-  (let ((js-file-names '(".jsx" ".tsx'" ".js" ".ts"))
+  (let ((js-file-names '(".jsx" ".tsx" ".js" ".ts"))
         (register-rjsx (lambda (extension) (add-to-list 'auto-mode-alist `(,(concat "\\" extension "\\'") . rjsx-mode)))))
     (mapc register-rjsx js-file-names))
 #+END_SRC
