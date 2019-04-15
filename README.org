@@ -147,6 +147,7 @@ The language server protocol is neat! I'd like to be able to use emacs to edit j
 install rjsx, configure it to spawn an lsp server (jsx support is built in to lsp-mode), and make some minor fixes 
 #+BEGIN_SRC emacs-lisp :tangle init.el
   (straight-use-package 'rjsx-mode)
+  (add-to-list 'lsp-language-id-configuration '(rjsx-mode . "javascript"))
   (add-hook 'rjsx-mode-hook
             (lambda ()
               (setq js2-strict-missing-semi-warning nil)
